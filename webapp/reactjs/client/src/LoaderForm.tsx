@@ -14,6 +14,7 @@ class LoaderForm extends React.Component<any, any> {
     }
 
     render() {
+        // form has target property which is id of iframe hence when form is posted it load in iframe
         return(
             <div style={{display: "none"}}>
                 <form ref={this.formElem} action={this.props.url} encType="multipart/form-data" method="post" target="collabora-online-viewer"

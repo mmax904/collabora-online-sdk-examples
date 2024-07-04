@@ -8,7 +8,7 @@ var fs = require('fs');
 var app = require('../app');
 var debug = require('debug')('reactjs:server');
 var http = require('http');
-var http = require('https');
+// var http = require('https');
 
 /**
  * Get port from environment and store in Express.
@@ -26,8 +26,8 @@ const credentials = {
   cert: fs.readFileSync('./server.crt'), // replace it with your certificate path
 }
 
+// var server = http.createServer(credentials, app);
 var server = http.createServer(app);
-var server = http.createServer(credentials, app);
 
 /**
  * Listen on provided port, on all network interfaces.

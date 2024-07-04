@@ -2,8 +2,10 @@ import React from 'react';
 import './App.css';
 import ServerAddressForm from './ServerAddressForm'
 import LoaderForm from './LoaderForm'
+// import DiffTool from './DiffTool';
+import DiffViewer from './DiffViewer';
 
-const collaboraHost = 'https://d58f-106-214-69-188.ngrok-free.app';
+const collaboraHost = 'https://445e-171-76-36-114.ngrok-free.app';
 const wopiHost = 'https://relaxed-elk-sincerely.ngrok-free.app';
 
 class App extends React.Component<any, any> {
@@ -122,6 +124,7 @@ class App extends React.Component<any, any> {
 
         return (
             <div className="App">
+                <DiffViewer />
                 <ServerAddressForm
                     address={this.state.serverAddress}
                     onChange={this.handleInputChanged}

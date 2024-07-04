@@ -111,6 +111,8 @@ docker run -t -d -p 9980:9980 --name "collabora-demo" -e "aliasgroup1=https://bf
 
 docker run -t -d -p 9980:9980 --name "collabora-demo" -e "aliasgroup1=https://relaxed-elk-sincerely.ngrok-free.app:443" -e "aliasgroup2=https://e135-106-214-69-188.ngrok-free.app:443" -e "domain=*" -e "username=admin" -e "password=admin" collabora/code
 
+docker run -t -d -p 9980:9980 --name "collabora-demo-non-ssl" -e "aliasgroup1=https://relaxed-elk-sincerely.ngrok-free.app:443" -e "domain=*" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false" collabora/code
+
 It is to be noted that as mentioned in WOPI specs, Collabora Online frame will ignore all post messages coming from the host frame if Host_PostmessageReady has not been received. Further, since for embedding Collabora Online as an iframe WOPI implementation is a must, it is required that PostMessageOrigin property is present in WOPI host’s CheckFileInfo response. Otherwise, no post messages will be emitted.
 
 Refused to frame 'https://demo.eu.collaboraonline.com/' because an ancestor violates the following Content Security Policy directive: "frame-ancestors demo.eu.collaboraonline.com:* bf45-106-214-69-188.ngrok-free.app:*".

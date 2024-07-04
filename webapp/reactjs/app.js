@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 
 var indexRouter = require('./routes/index');
 var wopiRouter = require('./routes/wopi');
+var apiRouter = require('./routes/api');
 
 // maximum request body size handled by the bodyParser package
 // increase it if you need to handle larger files
@@ -22,5 +23,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/wopi', wopiRouter);
+app.use('/api', apiRouter);
 
 module.exports = app;

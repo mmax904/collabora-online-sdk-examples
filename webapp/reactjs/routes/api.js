@@ -125,4 +125,19 @@ router.post('/compare/docs', upload.fields([{ name: 'fileA' }, { name: 'fileB' }
     }
 });
 
+router.post('/extract/data', upload.fields([{ name: 'fileA' }]), async (req, res) => {
+    const { fileA } = req.files;
+
+    try {
+        const { buffer } = fileA[0];
+
+        const result = await mammoth.convertToHtml({ buffer });
+
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error comparing files');
+    }
+});
+
 module.exports = router;

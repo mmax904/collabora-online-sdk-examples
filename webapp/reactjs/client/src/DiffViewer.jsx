@@ -1,10 +1,13 @@
 import React from 'react';
-import ReactDiffViewer from 'react-diff-viewer';
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer';
 
 function DiffViewer() {
     const [fileA, setFileA] = React.useState(null);
     const [fileB, setFileB] = React.useState(null);
-    const [diff, setDiff] = React.useState(null);
+    const [diff, setDiff] = React.useState({
+      textA: 'hello\n\nHow are you? What are your plan?',
+      textB: 'hello\n\nWhat are you? What are your plans?',
+    });
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -60,7 +63,9 @@ function DiffViewer() {
                     newValue={diff.textB} 
                     hideLineNumbers={true}
                     splitView={false}
+                    compareMethod={DiffMethod.CHARS}
                     styles={newStyles}
+                    showDiffOnly={true}
                 />
             }
         </div>

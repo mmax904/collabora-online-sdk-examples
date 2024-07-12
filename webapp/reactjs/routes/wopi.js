@@ -34,7 +34,8 @@ router.get('/files/:fileId', function (req, res) {
 	};
 
 	const wopiResponse = {
-		BaseFileName: `${req.params.fileId}.docx`,
+		// BaseFileName: `${req.params.fileId}.docx`,
+		BaseFileName: `${req.params.fileId}`,
 		OwnerId: 'owner-123',
 		Size: 12345, // You should provide the actual file size
 		UserId: user.id,
@@ -75,11 +76,16 @@ router.get('/files/:fileId/contents', async function (req, res) {
 	// for retrieving the file from the storage and
 	// send back the file content as response
 
-	const client = new S3Client();
+	const client = new S3Client({
+		credentials: {
+			accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+			secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+		}
+	});
 
 	const input = {
-		Bucket: 'staging-23',
-		Key: '64f992f2f1d658840ebbe716/actual/Redlined-Contract-Document.docx',
+		Bucket: 'elm-core-qa',
+		Key: `docreposervice-42982c97-569b-11eb-80cf-0281a3a095cb/${req.params.fileId}`,
 	};
 	const cmd = new GetObjectCommand(input);
 	const response = await client.send(cmd);
@@ -112,7 +118,7 @@ router.post('/files/:fileId/contents', async function (req, res) {
 
 		const input = {
 			Bucket: 'staging-23',
-			Key: '64f992f2f1d658840ebbe716/actual/Redlined-Contract-Document.docx',
+			Key: `docreposervice-42982c97-569b-11eb-80cf-0281a3a095cb/${req.params.fileId}`,
 			// Body: req.body.toString()
 			Body: req.body
 		};
@@ -142,7 +148,7 @@ router.post(
 
 		const input = {
 			Bucket: 'staging-23',
-			Key: '64f992f2f1d658840ebbe716/actual/Redlined-Contract-Document.docx',
+			Key: `docreposervice-42982c97-569b-11eb-80cf-0281a3a095cb/${fileId}`,
 			Body: req.body
 		};
 		await client.send(new PutObjectCommand(input));
@@ -150,7 +156,8 @@ router.post(
 		// const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${newFileKey}`;
 		const fileUrl = `https://7be4-106-214-69-188.ngrok-free.app/wopi/files/${fileId}`;
 		res.json({
-			Name: '123',
+			// Name: '123',
+			Name: fileId,
 			Url: fileUrl
 		});
 	} catch (error) {

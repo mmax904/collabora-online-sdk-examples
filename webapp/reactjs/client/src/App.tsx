@@ -3,10 +3,10 @@ import './App.css';
 import ServerAddressForm from './ServerAddressForm'
 import LoaderForm from './LoaderForm'
 // import DiffTool from './DiffTool';
-import TextDiff from './TextDiff';
 // import DiffViewer from './DiffViewer';
+// import TextDiff from './TextDiff';
 
-const collaboraHost = 'https://59ac-171-76-36-114.ngrok-free.app';
+const collaboraHost = 'https://6bdb-171-76-36-114.ngrok-free.app';
 const wopiHost = 'https://relaxed-elk-sincerely.ngrok-free.app';
 
 class App extends React.Component<any, any> {
@@ -24,7 +24,8 @@ class App extends React.Component<any, any> {
             wopiUrl: '',
             token: '',
             // fileId: myArray[0]
-            fileId: 123
+            fileId: 123,
+            fileName: 'Redlined-Contract-Document.docx',
         };
 
         const handleSaveEvent = async (event: any) => {
@@ -89,7 +90,8 @@ class App extends React.Component<any, any> {
         const locationOrigin = wopiHost;
         // const locationOrigin = 'http://localhost:3001';
         // const locationOrigin = 'https://localhost:3001';
-        const wopiSrc =  `${locationOrigin}/wopi/files/${this.state.fileId}`;
+        // const wopiSrc =  `${locationOrigin}/wopi/files/${this.state.fileId}`;
+        const wopiSrc =  `${locationOrigin}/wopi/files/${this.state.fileName}`;
         // const wopiSrc =  'https://staging-23.s3.us-east-1.amazonaws.com/64f992f2f1d658840ebbe716/actual/Resume%20Info%20%281%29.docx?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEHUaCXVzLWVhc3QtMSJHMEUCIB6TpSkWyeIajH28KhYIly3zZECCNiwiViXPrpagoFFtAiEAoT8h0y%2FS8ao8vq2dGBD3bUqOndz6ddPP8KoyzWnDmYwq6AIILhABGgw5NjE3MDcwNTQ4MzAiDIn74nqBWUFoPNiHfSrFAqcploLWFDTvADRk6Yk8L0W1FiNbeNuwoOOxUzM3D6pyHCpqhYFYs3Qf2hJaQKl2QL05WQl7DjM9i5P1BAw%2FkIy1n9GqMuvOL0C%2FJ%2BDq9dY11VqjXncimPWYmqHCutmrQ3Hzwt4AAm%2F0VwMlDB8F%2FHmn9irKgtlygYX7cayIy%2FzXoU6wogHW%2BWMqkJLIUiqXJAguBM3Syab%2BN0B4H7etpEsJCzJaXisxxOHe%2FYervjOenEGgCG3XIw0mMjvBc9Y5%2BEp0fmpI07jYuTyRTjrn1ixC0YzZCoGBIMrEsWcWy72Cw5Y53s5t9EXiPx9y2Ou%2BiwkqJgwx9%2FhZhFUKu3Us2qKKfQLfaCaLNDfvV2kfPupp8lY7e6cRk4Pnhwnutra3DIy5QzJyeXhllZhaoDSioi9LKJwkq4NE%2F3AuOPH7MCPQgfcl%2BKQwpIeAtAY6swLQq3WEnGwN5qAuwTvsjj52W5AZ7boI0t9SYCL8cHwz3pVxJ1wCwDopTDSS%2BK0diqd7YK07RLOsKAR%2Bl5vzXRg%2BknOeSldplfl6D4xfAWRuCEIDg9SW0G09CEiA9d9POsuici6OxP1tYUrCMCmYAO2zjOxD3wECff8Y2LidkmBDMgGg2BOxZi7rj2cwlXJC6rq4cvDTYyhJi5WqIbB617mfmIxRfIQtpmsFe4uXDgKDKK2R9uCvbf0oakJnRuxViUWsVBibkjYqRu5ndpdxslhN3WedsODLZJ34E%2BKynhBZgdmtUBE2JKSbHZauVfm%2BNaJfGre8%2F1P49YntPPrOOgugglTAl9pqde%2B2bXwTXuK39JxTgyaP%2BF6e1ZcIXo5h7XGF48I8KC5zTgJHumQcBekmO3KE&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240629T125539Z&X-Amz-SignedHeaders=host&X-Amz-Expires=43200&X-Amz-Credential=ASIA572RVC3XBSSOEBUT%2F20240629%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=1b2d2199357f29814774ea7a476928d022c66eff1f1447b083fe0b7699230cf4';
         const collaboraUrl = `${locationOrigin}/collaboraUrl?server=${wopiClientHost}&postMessageOrigin=${window.location.origin}`;
         console.log(collaboraUrl)
@@ -126,7 +128,11 @@ class App extends React.Component<any, any> {
         return (
             <div className="App">
                 {/* <DiffViewer /> */}
-                <TextDiff />
+                {/* <TextDiff /> */}
+                <label htmlFor="docx-file-name">
+                    Enter File Name:
+                    <input type="text" value={this.state.fileName} onChange={(event) => this.setState({fileName: event.target.value})} />
+                </label>
                 <ServerAddressForm
                     address={this.state.serverAddress}
                     onChange={this.handleInputChanged}

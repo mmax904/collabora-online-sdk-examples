@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create Zillit Module Instance
+
+Parameters:
+  Priority:
+    Type: Number
+    Default: 50
+    Description: The priority for the routing rule added to the load balancer.
+                 This only applies if your have multiple services which have been
+                 assigned to different paths on the load balancer.
+  MinCapacity:
+    Type: Number
+    Default: 0
+    Description: Min copies of the service task to run
+  ListenerArn:
+    Type: String
+    Default: 'arn:aws:elasticloadbalancing:us-east-1:961707054830:listener/app/ZILLIT-QA/d6845f31d7dba2bb/ada5dbf4410229d4'
+    Description: Listener code
+  ClusterName:
+    Type: String
+    Default: 'Zillit-QA'
+    Description: Default cluster
+  Domain:
+    Type: String
+    Default: 'collaboraapi-qa.zillit.com'
+    Description: Here enter the domain on which you want to deploy the app
+  ModuleName:
+    Type: String
+    Default: 'Collabora'
+    Description: Enter the module name
+  ModuleId:
+    Type: String
+    Default: 'collabora'
+    Description: Enter the module id
+  ModuleCode:
+    Type: String
+    Default: 'COLLABORA'
+    Description: Enter the module code
+  StageName:
+    Type: String
+    Default: 'QA'
+    Description: Enter the stage name
+  StageId:
+    Type: String
+    Default: 'qa'
+    Description: Enter the stage id
+  WebURL:
+    Type: String
+    Default: 'https://qa.zillit.com'
+    Description: Enter the website url
+
+Resources:
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      LogGroupName:
+        !Join ['/', ['/ecs', !Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: CloudWatchLogGroup
+    Properties:
+      ContainerDefinitions:
+        - Name: !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+          Cpu: 1024
+          Environment:
+            - Name: 'AWS_REGION'
+              Value: !Ref 'AWS::Region'
+            - Name: 'ALLOW_ACCESS_ORIGIN'
+              Value: '*'
+            - Name: 'aws_param_path'
+              Value: !Sub "/${ModuleId}/${StageId}/"
+            - Name: 'module_code'
+              Value: !Ref 'ModuleCode'
+            - Name: 'FIREBASE_APPNAME'
+              Value: !Ref 'StageId'
+            - Name: 'FRONT_END_URL'
+              Value: !Ref 'WebURL'
+            - Name: 'domain'
+              Value: !Ref 'Domain'
+            - Name: 'username'
+              Value: 'admin'
+            - Name: 'password'
+              Value: 'admin'
+            - Name: 'aliasgroup1'
+              Value: 'https://.*:443'
+            - Name: 'extra_params'
+              Value: '--o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*'
+          Image: collabora/code:latest
+          Essential: true
+          # Command: ["/bin/bash", "-c", "/usr/bin/coolwsd --o:ssl.enable=false --o:net.proto=IPv4"]
+          # Command: ["/start-collabora-online.sh --o:net.proto=IPv4"]
+          # Command: ["start-collabora-online.sh"]
+          # Command: ["sh", "-c", " ls -la && /start-collabora-online.sh"]
+          # Command: ["bash", "-c", "/start-collabora-online.sh --o:net.content_security_policy=frame-ancestors *"]
+          LogConfiguration:
+            LogDriver: 'awslogs'
+            Options:
+              awslogs-group: !Ref 'CloudWatchLogGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: 9980
+      Cpu: 1024
+      ExecutionRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole'
+      Family: !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+      Memory: 2048
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Tags:
+        - Key: Product
+          Value: !Ref 'ModuleName'
+        - Key: Environment
+          Value: !Ref 'StageName'
+      TaskRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole'
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: TaskDefinition
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTPS
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      TargetType: ip
+      Name:  !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+      Port: 9980
+      Protocol: HTTPS
+      UnhealthyThresholdCount: 3
+      VpcId: 'vpc-08d3523e368ebc6b8'
+      Tags:
+        - Key: Product
+          Value: !Ref 'ModuleName'
+        - Key: Environment
+          Value: !Ref 'StageName'
+
+  LoadBalancerListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    DependsOn: TargetGroup
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref 'TargetGroup'
+          Type: 'forward'
+      Conditions:
+        - Field: host-header
+          Values: [ !Ref Domain ]
+      ListenerArn: !Ref ListenerArn
+      Priority: !Ref 'Priority'
+
+  ECSServiceWithLB:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerListenerRule
+    Properties:
+      ServiceName:  !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+      Cluster: !Ref ClusterName
+      LaunchType: FARGATE
+      DesiredCount: !Ref MinCapacity
+      HealthCheckGracePeriodSeconds: 120
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - 'sg-01f2ac87d591ce58a'
+          Subnets:
+            - 'subnet-02e69f7f4418dc99a'
+            - 'subnet-057ecd1174c0d671b'
+            - 'subnet-0fa8fb5b46cb1f769'
+            - 'subnet-0f05db5f27ffb68ad'
+            - 'subnet-092a2b1f0e4c9df8f'
+            - 'subnet-077889932d0b80232'
+      TaskDefinition: !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+      LoadBalancers:
+        - ContainerName: !Join ['-', [!Ref 'ModuleName', !Ref 'StageName', 'Backend']]
+          ContainerPort: 9980
+          TargetGroupArn: !Ref 'TargetGroup'
+      Tags:
+        - Key: Product
+          Value: !Ref 'ModuleName'
+        - Key: Environment
+          Value: !Ref 'StageName'
+

@@ -6,7 +6,7 @@ import LoaderForm from './LoaderForm'
 // import DiffViewer from './DiffViewer';
 // import TextDiff from './TextDiff';
 
-const collaboraHost = 'https://6bdb-171-76-36-114.ngrok-free.app';
+const collaboraHost = 'https://813a-223-182-254-86.ngrok-free.app';
 const wopiHost = 'https://relaxed-elk-sincerely.ngrok-free.app';
 
 class App extends React.Component<any, any> {
@@ -142,7 +142,8 @@ class App extends React.Component<any, any> {
                     id="collabora-online-viewer"
                     title="Collabora Online Viewer"
                     name="collabora-online-viewer"
-                    allow="clipboard-read *; clipboard-write *">
+                    allowFullScreen
+                    allow={`clipboard-read *; clipboard-write *; ${collaboraHost}`}>
                 </iframe>
             </div>
         );

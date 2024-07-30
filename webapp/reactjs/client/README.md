@@ -193,3 +193,32 @@ https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/on
 
 
 node-http-handler@3.1.1 for MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close listeners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit in s3-client
+
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors
+
+<content_security_policy desc="Customize the CSP header by specifying one or more policy-directive, separated by semicolons. See w3.org/TR/CSP2">frame-ancestors *</content_security_policy>
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo" -e "aliasgroup1=https://relaxed-elk-sincerely.ngrok-free.app:443" -e "username=admin" -e "password=admin" collabora/code
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl" -e "aliasgroup1=http://localhost:3000" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false" collabora/code
+
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 127.0.0.1:9980:9980 --name "collabora-demo-non-ssl" -e "domain=*" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false --o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
+
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-1" -e "domain=*" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false --o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" -e "aliasgroup1=http://localhost:3001" -e "DONT_GEN_SSL_CERT=true" collabora/code
+
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-1" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001" -e "extra_params=--o:ssl.enable=false" collabora/code
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-2" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001:80" -e "extra_params=--o:ssl.enable=false" collabora/code
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-3" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001:443" -e "extra_params=--o:ssl.enable=false" collabora/code
+
+docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-3" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://.*:443" -e "extra_params=--o:ssl.enable=false" collabora/code
+
+
+EC2 -> Security Groups sg-01f2ac87d591ce58a -> zillit-qa-loadbalancer
+Add custom tcp for port 9980 & source should be the load balancer ipv4
+

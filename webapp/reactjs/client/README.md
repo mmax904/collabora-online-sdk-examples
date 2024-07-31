@@ -84,7 +84,7 @@ ngrok start --config ngrok.yml --all
 ngrok.yml
 =========
 version: "2"
-authtoken: 1S4UgJnJ3jBDtX5gWmuizv0MpyK_5oqeDAB7pwoh94HuvZXGG
+authtoken: <ngrok_token>
 tunnels:
   wopi:
     proto: http
@@ -104,6 +104,31 @@ tunnels:
     # domain: relaxed-elk-sincerely.ngrok-free.app
     # hostname: relaxed-elk-sincerely.ngrok-free.app
     host_header: localhost:3000
+
+version: "2"
+authtoken: <ngrok_token>
+tunnels:
+  wopi:
+    proto: http
+    addr: 3001
+    # addr: https://localhost:3001
+    # domain: relaxed-elk-sincerely.ngrok-free.app
+    hostname: relaxed-elk-sincerely.ngrok-free.app
+    # host_header: localhost:3001
+  collabora:
+    proto: http
+    addr: 9980
+    # addr: https://localhost:9980
+    # domain: relaxed-elk-sincerely.ngrok-free.app
+    # hostname: relaxed-elk-sincerely.ngrok-free.app
+    # host_header: localhost:9980
+  collabora-web:
+    proto: http
+    addr: 3000
+    # addr: http://localhost:3000
+    # domain: relaxed-elk-sincerely.ngrok-free.app
+    # hostname: relaxed-elk-sincerely.ngrok-free.app
+    # host_header: localhost:3000
 
 docker run -t -d -p 9980:9980 --name "collabora-demo" -e "aliasgroup1=https://09c9-106-214-69-188.ngrok-free.app:443" -e "domain=*" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false" collabora/code
 

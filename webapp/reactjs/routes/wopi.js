@@ -90,6 +90,9 @@ router.get('/files/:fileId/contents', async function (req, res) {
 	const cmd = new GetObjectCommand(input);
 	const response = await client.send(cmd);
 
+	res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+	res.setHeader('Content-Disposition', `attachment; filename="${req.params.fileId}"`);
+
 	// await response.Body.transformToByteArray: [AsyncFunction: transformToByteArray],
     // await response.Body.transformToString: [AsyncFunction: transformToString],
     // await response.Body.transformToWebStream: [Function: transformToWebStream],

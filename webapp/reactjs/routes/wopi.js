@@ -1,7 +1,10 @@
 const path = require('path');
+const axios = require('axios');
 var express = require('express');
 const multer = require('multer');
 const crypto = require('crypto');
+const FormData = require('form-data');
+const fs = require('fs');
 
 const {
 	S3Client, PutObjectCommand, GetObjectCommand,
@@ -9,6 +12,9 @@ const {
 
 var router = express.Router();
 const upload = multer({ dest: 'uploads/' });
+
+const memStorage = multer.memoryStorage();
+const memUpload = multer({ storage: memStorage });
 
 /* *
  *  wopi CheckFileInfo endpoint
@@ -164,6 +170,69 @@ router.post(
 			Url: fileUrl
 		});
 	} catch (error) {
+		res.status(500).send(error.toString());
+	}
+});
+
+// https://relaxed-elk-sincerely.ngrok-free.app/wopi/files/Redlined-Contract-Document.docx/convert-pdf
+router.get(
+	'/files/:fileId/convert-pdf',
+	// memUpload.single('document'),
+	async (req, res) => {
+	const { fileId } = req.params;
+	const { access_token } = req.query;
+	const bucketName = process.env.S3_BUCKET_NAME;
+
+	try {
+		const outputFilePath = path.join(__dirname, 'document.pdf');
+		console.log('outputFilePath', outputFilePath)
+
+		// Step 1: Download the DOCX file from S3
+		const client = new S3Client({
+			credentials: {
+				accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+				secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+			}
+		});
+		const input = {
+			Bucket: bucketName,
+			Key: `docreposervice-42982c97-569b-11eb-80cf-0281a3a095cb/${req.params.fileId}`,
+		};
+		const cmd = new GetObjectCommand(input);
+		const docxFile = await client.send(cmd);
+		const document = docxFile.Body;
+		// const document = await response.Body.transformToByteArray();
+		const formData = new FormData();
+		formData.append('data', document);
+
+		// Step 2: Send the DOCX file to the Collabora Online server
+        const collaboraUrl = 'https://localhost:9983/cool/convert-to/pdf';
+        // const collaboraUrl = 'https://5e1e-171-61-205-106.ngrok-free.app/cool/convert-to/pdf';
+        const response = await axios.post(collaboraUrl, formData, {
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            },
+            responseType: 'arraybuffer' // Important to get the PDF in binary format
+        });
+
+		// const pdfFileInput = {
+		// 	Bucket: 'staging-23',
+		// 	Key: `docreposervice-42982c97-569b-11eb-80cf-0281a3a095cb/${fileId}`,
+		// 	Body: response.data
+		// };
+		// await client.send(new PutObjectCommand(pdfFileInput));
+
+		
+        // Step 3: Save the resulting PDF file on the server
+        fs.writeFileSync(outputFilePath, response.data);
+
+		const fileUrl = `https://7be4-106-214-69-188.ngrok-free.app/wopi/files/${fileId}`;
+		res.json({
+			Name: fileId,
+			Url: fileUrl
+		});
+	} catch (error) {
+		console.log(error.message);
 		res.status(500).send(error.toString());
 	}
 });

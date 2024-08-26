@@ -235,15 +235,40 @@ docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/rea
 docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-1" -e "domain=*" -e "username=admin" -e "password=admin" -e "extra_params=--o:ssl.enable=false --o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" -e "aliasgroup1=http://localhost:3001" -e "DONT_GEN_SSL_CERT=true" collabora/code
 
 
-docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-1" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001" -e "extra_params=--o:ssl.enable=false" collabora/code
+docker run -t -d -p 9980:9980 --name "collabora-ssl-mcp" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=https://mcpservice.elmqa.elevate.law:443" -e "extra_params=--o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
 
-docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-2" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001:80" -e "extra_params=--o:ssl.enable=false" collabora/code
+docker run -t -d -p 9983:9980 --name "collabora-relaxed" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=https://relaxed-elk-sincerely.ngrok-free.app:443" -e "extra_params=--o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
 
-docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-3" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://localhost:3001:443" -e "extra_params=--o:ssl.enable=false" collabora/code
-
-docker run -t -d -v /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs/client/playground/coolwsd.xml:/etc/coolwsd/coolwsd.xml -p 9980:9980 --name "collabora-demo-non-ssl-3" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://.*:443" -e "extra_params=--o:ssl.enable=false" collabora/code
+docker run -t -d -p 9982:9980 --name "collabora-non-ssl-test" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://.*:*" -e "extra_params=--o:ssl.enable=false --o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
 
 
 EC2 -> Security Groups sg-01f2ac87d591ce58a -> zillit-qa-loadbalancer
 Add custom tcp for port 9980 & source should be the load balancer ipv4
+
+docker scout quickview collabora/code
+docker logs collabora-demo-non-ssl
+
+docker run -t -d -p 9983:9980 --name "collabora-relaxed" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=https://relaxed-elk-sincerely.ngrok-free.app:443" -e "extra_params=--o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
+
+ngrok http https://localhost:9980
+ngrok config check
+/Users/manish/Ngrok/ngrok.yml
+/Users/manish/Ngrok
+ngrok start --config ngrok.yml --all
+
+
+
+Convert To PDF
+==============
+Terminal
+pwd: /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs
+curl -k -F "data=@/Users/manish/Downloads/Redlined-Contract-Document.docx" https://localhost:9983/cool/convert-to/pdf > out.pdf
+
+PostMan
+curl --location 'https://localhost:9983/cool/convert-to/pdf' \
+--form 'data=@"/Users/manish/Downloads/Redlined-Contract-Document.docx"'
+
+API
+https://relaxed-elk-sincerely.ngrok-free.app/wopi/files/Redlined-Contract-Document.docx/convert-pdf
+
 

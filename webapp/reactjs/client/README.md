@@ -242,6 +242,7 @@ docker run -t -d -p 9983:9980 --name "collabora-relaxed" -e "domain=*" -e "usern
 docker run -t -d -p 9982:9980 --name "collabora-non-ssl-test" -e "domain=*" -e "username=admin" -e "password=admin" -e "aliasgroup1=http://.*:*" -e "extra_params=--o:ssl.enable=false --o:net.content_security_policy=frame-ancestors * --o:net.frame_ancestors=*" collabora/code
 
 
+https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#SecurityGroup:groupId=sg-046a57644e51dfccb   9980   172.31.0.0/16
 EC2 -> Security Groups sg-01f2ac87d591ce58a -> zillit-qa-loadbalancer
 Add custom tcp for port 9980 & source should be the load balancer ipv4
 
@@ -260,6 +261,8 @@ ngrok start --config ngrok.yml --all
 
 Convert To PDF
 ==============
+Add IP(my ip or anywhere) in security group to access port 9980 so as to access public ip of collabora ECS service
+
 Terminal
 pwd: /Users/manish/Sites/collabora-online-sdk-examples/webapp/reactjs
 curl -k -F "data=@/Users/manish/Downloads/Redlined-Contract-Document.docx" https://localhost:9983/cool/convert-to/pdf > out.pdf

@@ -1,4 +1,5 @@
 require('dotenv').config()
+const fileUpload = require('express-fileupload');
 var express = require('express');
 var path = require('path');
 var cors = require('cors');
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.raw({limit: maxDocumentSize}));
+app.use(fileUpload());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
